@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share to WhatsApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <h1>Capture and Share Section</h1>
+
+    <div id="capture-section" style="border: 2px solid #ccc; padding: 20px; margin-bottom: 20px;">
+        <h2>Capture Section</h2>
+        <p>This section will be captured and shared on WhatsApp.</p>
+        <form>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name"><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"><br><br>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <button id="share-button">Share to WhatsApp</button>
+
+    <script>
+        document.getElementById("share-button").addEventListener("click", function () {
+            const captureSection = document.getElementById("capture-section");
+
+            html2canvas(captureSection).then((canvas) => {
+                // Convert canvas to image URL
+                canvas.toBlob((blob) => {
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    // WhatsApp sharing
+                    const encodedMessage = encodeURIComponent("Check this out!");
+                    const whatsappUrl = `https://wa.me/?text=${encodedMessage}&url=${imageUrl}`;
+
+                    window.open(whatsappUrl, "_blank");
+                }, "image/jpeg");
+            });
+        });
+    </script>
+</body>
+</html>
