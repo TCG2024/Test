@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Share to WhatsApp</title>
+    <title>Save as PDF</title>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <h1>Capture and Share Section</h1>
+    <h1>Capture and Save as PDF</h1>
 
     <div id="capture-section" style="border: 2px solid #ccc; padding: 20px; margin-bottom: 20px;">
         <h2>Capture Section</h2>
-        <p>This section will be captured and shared on WhatsApp.</p>
+        <p>This section will be captured and saved as a PDF file.</p>
         <form>
             <label for="name">Name:</label>
             <input type="text" id="name" name="name"><br><br>
@@ -23,25 +24,30 @@
         </form>
     </div>
 
-    <button id="share-button">Capture and Share to WhatsApp</button>
-    <a id="download-link" style="display: none;" download="capture.jpg"></a>
+    <button id="save-pdf-button">Save as PDF</button>
 
     <script>
-        document.getElementById("share-button").addEventListener("click", function () {
+        document.getElementById("save-pdf-button").addEventListener("click", function () {
             const captureSection = document.getElementById("capture-section");
 
             html2canvas(captureSection).then((canvas) => {
-                // Convert canvas to a data URL
-                canvas.toBlob((blob) => {
-                    const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
-                    const dataTransfer = new ClipboardEvent("").clipboardData || new DataTransfer();
-                    dataTransfer.items.add(file);
-                    
-                    // Open WhatsApp sharing
-                    const message = encodeURIComponent("Here's the captured content!");
-                    const whatsappURL = `https://wa.me/?text=${message}`;
-                    window.open(whatsappURL, "_blank");
-                }, "image/jpeg");
+                const imgData = canvas.toDataURL("image/jpeg", 1.0);
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+
+                // Add the image to the PDF
+                const imgWidth = 190; // A4 page width in mm minus margins
+                const pageHeight = 297; // A4 page height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                if (imgHeight > pageHeight) {
+                    pdf.addImage(imgData, "JPEG", 10, 10, imgWidth, pageHeight - 20);
+                } else {
+                    pdf.addImage(imgData, "JPEG", 10, 10, imgWidth, imgHeight);
+                }
+
+                // Save the PDF
+                pdf.save("capture.pdf");
             });
         });
     </script>
